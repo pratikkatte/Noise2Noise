@@ -8,6 +8,7 @@ import random
 import numpy as np
 
 from torch.utils.data import Dataset, DataLoader
+import torch.nn.functional as F
 
 
 class ImageNetDataset(Dataset):
@@ -113,4 +114,33 @@ def get_args():
     args = parser.parse_args()
     
     return args
+
+
+def getTrainLoader(dataset_path, token, batch_size):
+
+	train_dataset = ImageNetDataset(dataset_path,
+									transform=transforms.Compose([
+										addNoise(token, (0,50)),
+										transforms.ToPILImage(),
+										transforms.Resize((256,256)),
+										transforms.ToTensor(),
+									]))
+
+	train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+
+	return(train_loader)
+
+
+def getLabledLoader(dataset_path, token, batch_size):
+	label_dataset = ImageNetDataset(data_path,
+									transform=transform.Compose([
+										addNoise(token, (0,50)),
+										transforms.ToPILImage(),
+										transforms.Resize((256,256)),
+										transforms.ToTensor()
+									]))
+
+	label_loader = DataLoader(label_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+
+	return(label_loader)
 
