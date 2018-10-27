@@ -1,22 +1,21 @@
 
 import numpy as np
 import os
-from skimage import io
-import argparse
+import cv2
 import string
 import random
-import numpy as np
-
+import torch
 from torch.utils.data import Dataset, DataLoader
+import torchvision.transforms as transforms
 import torch.nn.functional as F
-
+from skimage import io
 
 class ImageNetDataset(Dataset):
     
-    def __init__(self, root_dir, data_folder, transform=None):
-        self.data_path = os.path.join(root_dir,data_folder)
+    def __init__(self, dataset_path, transform=None):
+        self.data_path = dataset_path
+
         self.data = os.listdir(self.data_path)
-        self.root = root_dir
         self.transform = transform
         
     def __len__(self):
@@ -29,15 +28,16 @@ class ImageNetDataset(Dataset):
         if self.transform:
             image = self.transform(image)
         
-        return image,img_name
+        return image
 
 
-
-class addNoise:
+class addNoise(object):
     
     def __init__(self,token, std_range=None):
         self.token = token
         self.std_range = std_range
+        self.min_occupancy = 1
+        self.max_occupancy = 20
         
     def __call__(self, img):
         
@@ -55,6 +55,10 @@ class addNoise:
             return noise_img
 
         elif self.token == "text":
+
+            if len(np.shape(img))==2:
+                img = np.stack((img,)*3, axis=-1)
+
             img = img.copy()
             h, w, _ = img.shape
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -78,69 +82,53 @@ class addNoise:
             return img
 
         elif self.token == "poisson":
+            if len(np.shape(img))==2:
+                img = np.stack((img,)*3, axis=-1)
 
             image = img.astype(float)
 
-            noise_mask = numpy.random.poisson(image)
+            noise_mask = np.random.poisson(image)
 
             noisy_img = img + noise_mask
+            noisy_img = noisy_img.astype(np.uint8)
 
             return noisy_img
 
-
-class Rescale(object):
-
-    def __call__(self, image):
-
-        if len(image.shape) == 2:
-            image = np.stack((image,)*3, axis=-1)
-        resize = transforms.Resize((256,256))
-
-        tens = transforms.ToTensor()
-        
-        img = tens(resize(image))
-        print(type(img))
-        return img
+        else:
+            return img
 
 
 
-def get_args():
-    parser = argparse.ArgumentParser(description="Data set Prep for image restoration",
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--image_size", type=int, default=256,
-                        help="training patch size")
-    parser.add_argument("--noise_model", type=str, default="gaussian,0,50",
-                        help="noise model to be trained")
-    args = parser.parse_args()
-    
-    return args
+def getTrainLoader(dataset_path, noise_model, batch_size):
+
+    train_dataset = ImageNetDataset(dataset_path,
+                                    transform=transforms.Compose([
+                                        addNoise(noise_model, (0,50)),
+                                        transforms.ToPILImage(),
+                                        transforms.Resize((256,256)),
+                                        transforms.ToTensor(),
+                                    ]))
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+
+    return(train_loader)
 
 
-def getTrainLoader(dataset_path, token, batch_size):
+def getLabledLoader(dataset_path, noise_model, batch_size):
+    label_dataset = ImageNetDataset(dataset_path,   
+                                    transform=transforms.Compose([
+                                        addNoise(noise_model, (0,50)),
+                                        transforms.ToPILImage(),
+                                        transforms.Resize((256,256)),
+                                        transforms.ToTensor()
+                                    ]))
 
-	train_dataset = ImageNetDataset(dataset_path,
-									transform=transforms.Compose([
-										addNoise(token, (0,50)),
-										transforms.ToPILImage(),
-										transforms.Resize((256,256)),
-										transforms.ToTensor(),
-									]))
+    label_loader = DataLoader(label_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 
-	train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-
-	return(train_loader)
+    return(label_loader)
 
 
-def getLabledLoader(dataset_path, token, batch_size):
-	label_dataset = ImageNetDataset(data_path,
-									transform=transform.Compose([
-										addNoise(token, (0,50)),
-										transforms.ToPILImage(),
-										transforms.Resize((256,256)),
-										transforms.ToTensor()
-									]))
+def pyprint(text):
+    print(text)
 
-	label_loader = DataLoader(label_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-
-	return(label_loader)
-
+                    
