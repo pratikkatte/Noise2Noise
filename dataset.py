@@ -128,7 +128,4 @@ def getLabledLoader(dataset_path, noise_model, batch_size):
     return(label_loader)
 
 
-def pyprint(text):
-    print(text)
-
                     
