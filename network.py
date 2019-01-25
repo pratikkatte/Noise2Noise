@@ -11,6 +11,7 @@ class UNet(nn.Module):
     def __init__(self):
         super(UNet, self).__init__()
         
+        
         self.conv1 = nn.Conv2d(3,48,3,padding=1)
 
         self.conv2 = nn.Conv2d(48,48,3,padding=1)
@@ -130,35 +131,15 @@ class UNet(nn.Module):
     
     
     
-class lossOptimiser:
-    def __init__(self, net, config):
-        self.loss = torch.nn.MSELoss()
-        self.adam_optim = optim.Adam(net.parameters(), lr=config['learning_rate'], betas=(0.9,0.99),eps=1e-8)
-        
-#     def optimise_parameters(self, loss_size):
-#         self.optimiser.zero_grad()
-#         loss_size.backward()
-#         self.optimiser.step()
+def lossOptimiser(net, config):
 
-def print_network(net):
-    num_params = 0
-    for param in net.parameters():
-        num_params += param.numel()
-    print(net)
-    print('number of parameters: %d'% (num_params))
-    
-    
-def save_network(net, label, epoch,optimizer,loss_size, config):
-    filename = '%s_net_%s.pt' % (str(label),str(epoch))
-    save_path = os.path.join(config['checkpoint_dir'], filename)
-    torch.save({
-        'epoch': epoch,
-        'model_state_dict': net.state_dict(),
-        'optimiser': optimizer.adam_optim.state_dict(),
-        'loss':loss_size
-    }, save_path)
-                
-    
+        loss = torch.nn.MSELoss()
+        adam_optim = optim.Adam(net.parameters(), lr=config['learning_rate'], betas=(0.9,0.99),eps=1e-8)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(adam_optim, patience=config['num_epochs']/4, factor=0.5, verbose=True)
+        return loss, adam_optim, scheduler  
+
+
+
     
         
 

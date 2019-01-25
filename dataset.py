@@ -24,11 +24,12 @@ class addGaussian:
         return noise_img
 
 class GaussianDataset:
+
     def init(self, config):
         
         self.data_path = os.path.join(config['root_dir'],config['data_folder'])
         self.data = sorted(os.listdir(self.data_path))[0:100]
-        
+
         transform_list = [addGaussian((0,50)),
                      transforms.ToPILImage(),
                      transforms.Resize((256,256)),
@@ -42,9 +43,10 @@ class GaussianDataset:
         img_path = os.path.join(self.data_path,img_name)
         
         image = io.imread(img_path)
-        image = self.transform(image)
-        
-        return image,img_name
+        source_image = self.transform(image)
+        target_image = self.transform(image)
+
+        return source_image, target_image
     
     def __len__(self):
         return len(self.data)
