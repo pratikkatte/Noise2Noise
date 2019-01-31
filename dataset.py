@@ -25,17 +25,29 @@ class addGaussian:
 
 class GaussianDataset:
 
-    def init(self, config):
+    def __init__(self, config, dataset_for):
         
         self.data_path = os.path.join(config['root_dir'],config['data_folder'])
-        self.data = sorted(os.listdir(self.data_path))[0:100]
+        if dataset_for == 'train':
+            
+            self.data = sorted(os.listdir(self.data_path))[0:24000]
 
-        transform_list = [addGaussian((0,50)),
-                     transforms.ToPILImage(),
-                     transforms.Resize((256,256)),
-                     transforms.ToTensor()]
-        
-        self.transform = transforms.Compose(transform_list)
+            transform_list = [addGaussian((0,50)),
+                         transforms.ToPILImage(),
+                         transforms.Resize((256,256)),
+                         transforms.ToTensor()]
+
+            self.transform = transforms.Compose(transform_list)
+            
+        else:
+            self.data = sorted(os.listdir(self.data_path))[24000:30000]
+
+            transform_list = [addGaussian((0,50)),
+                         transforms.ToPILImage(),
+                         transforms.Resize((256,256)),
+                         transforms.ToTensor()]
+
+            self.transform = transforms.Compose(transform_list)
         
     def __getitem__(self, index):
         img_name = self.data[index]
@@ -46,12 +58,10 @@ class GaussianDataset:
         source_image = self.transform(image)
         target_image = self.transform(image)
 
-        return source_image, target_image
+        return source_image, target_image, img_name
     
     def __len__(self):
         return len(self.data)
-
-
 
 class TextDataset:
     
@@ -70,14 +80,13 @@ class addText:
         pass
 
 
-def createDataset(config):
+def createDataset(config,dataset_for):
     dataset = None
     if config['dataset'] == 'gaussian':
-        dataset = GaussianDataset()
+        dataset = GaussianDataset(config, dataset_for)
     if config['dataset'] == 'Text':
         dataset = addText()
     
-    dataset.init(config)
     print('%s dataset was created.' % config['dataset'])
  
     return dataset
@@ -85,13 +94,21 @@ def createDataset(config):
 
 class datasetLoader:
     
-    def __init__(self, config):
-        self.dataset = createDataset(config)
-        self.dataloader = DataLoader(
-            self.dataset,
-            batch_size = config['batch_size'],
-            shuffle = True,
-            num_workers = int(config['num_workers']))
+    def __init__(self, config, dataset_for):
+        self.dataset = createDataset(config, dataset_for)
+        if dataset_for == 'train':
+            self.dataloader = DataLoader(
+                self.dataset,
+                batch_size = config['batch_size_train'],
+                shuffle = True,
+                num_workers = int(config['num_workers']))
+        else:
+            self.dataloader = DataLoader(
+                self.dataset,
+                batch_size = config['batch_size_valid'],
+                shuffle = True,
+                num_workers = int(config['num_workers']))
+
 
     def load_data(self):
         return self.dataloader

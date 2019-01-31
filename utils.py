@@ -1,6 +1,5 @@
 from datetime import datetime
 import numpy as np
-import torch.nn.functional as F
 import torch
 import os
 import json
@@ -45,7 +44,7 @@ def show_on_report(batch_idx, num_batches, loss, elapsed):
     print('Batch {:>{dec}d} / {:d} | Avg loss: {:>1.5f} | Avg train time / batch: {:d} ms'.format(batch_idx + 1, num_batches, loss, int(elapsed), dec=dec))
     
 def psnr(source, target):
-    return 10 * torch.log10(1 / F.mse_loss(source, target))
+    return 10 * np.log10(1 / ((spurce - target)**2).mean())
 
 
 def save_network(net, label, epoch,optimizer,loss_size, config, stats):
@@ -70,12 +69,6 @@ def print_network(net):
     print(net)
     print('number of parameters: %d'% (num_params))
     
-    
-    
-def load_network(net, label, epoch):
-    file_name = '%s_net_%s.pt' % (str(label), str(epoch))
-    save_path = os.path.join(config['checkpoint_dir'], filename)
-    net.load_state_dict(torch.load(save_path))
 
                 
     

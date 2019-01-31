@@ -13,8 +13,12 @@ class viewSummary(object):
             self.logger.scalar_summary(tag, value[0], epoch)
         
     def view_image(self, image_stat, epoch):
-        for tag, image in image_stat.items():
-                self.logger.image_summary(tag, image, epoch)
+        images = []
+        for i in range(1):
+            for tag in image_stat.keys():
+                images.append(image_stat[tag][i])
+                
+            self.logger.image_summary('image', images, epoch)
             
     def view_parameters(self, model):
         for tag, value in model.named_parameters():

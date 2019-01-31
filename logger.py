@@ -23,7 +23,7 @@ class Logger(object):
         """Log a list of images."""
 
         img_summaries = []
-        for i, img in enumerate(images):
+        for i,img in enumerate(images):
             # Write the image to a string
             try:
                 s = StringIO()
@@ -36,7 +36,7 @@ class Logger(object):
                                        height=img.shape[0],
                                        width=img.shape[1])
             # Create a Summary value
-            img_summaries.append(tf.Summary.Value(tag='%s/%d' % (tag, i), image=img_sum))
+            img_summaries.append(tf.Summary.Value(tag='%s/%d' % (tag,i), image=img_sum))
 
         # Create and write Summary
         summary = tf.Summary(value=img_summaries)

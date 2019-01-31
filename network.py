@@ -10,8 +10,7 @@ class UNet(nn.Module):
     
     def __init__(self):
         super(UNet, self).__init__()
-        
-        
+                
         self.conv1 = nn.Conv2d(3,48,3,padding=1)
 
         self.conv2 = nn.Conv2d(48,48,3,padding=1)
