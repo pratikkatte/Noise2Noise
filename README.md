@@ -19,12 +19,14 @@ Any dataset can be used in training and validation instead of the above dataset.
 
 ### Train Model
 Please see `python3 train.py [-h]` for argument options.
-
+[TODO] create a config file.
 
 ### Train with Gaussian noise
 
+[TODO]
 ### Train with Poissons noise
 
+[TODO]
 ### Train with Textual noise
 
 
