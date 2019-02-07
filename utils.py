@@ -62,13 +62,5 @@ def save_network(net, label, epoch,optimizer,loss_size, config, stats):
         json.dump(stats, fp, indent=2)
 
 
-def print_network(net):
-    num_params = 0
-    for param in net.parameters():
-        num_params += param.numel()
-    print(net)
-    print('number of parameters: %d'% (num_params))
-    
-
                 
     
