@@ -4,3 +4,4 @@ __pycache__/
 data.py
 prac.py
 .ipynb_checkpoints/
+data/

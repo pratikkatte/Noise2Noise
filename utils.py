@@ -44,7 +44,7 @@ def show_on_report(batch_idx, num_batches, loss, elapsed):
     print('Batch {:>{dec}d} / {:d} | Avg loss: {:>1.5f} | Avg train time / batch: {:d} ms'.format(batch_idx + 1, num_batches, loss, int(elapsed), dec=dec))
     
 def psnr(source, target):
-    return 10 * np.log10(1 / ((spurce - target)**2).mean())
+    return 10 * np.log10(1 / ((source - target)**2).mean())
 
 
 def save_network(net, label, epoch,optimizer,loss_size, config, stats):
@@ -60,7 +60,3 @@ def save_network(net, label, epoch,optimizer,loss_size, config, stats):
     json_filename = '{}/n2nstate.json'.format(config['checkpoint_dir'])
     with open(json_filename, 'w') as fp:
         json.dump(stats, fp, indent=2)
-
-
-                
-    

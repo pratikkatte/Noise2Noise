@@ -57,7 +57,7 @@ class Noise2Noise(object):
         valid_start = datetime.now()
 
     
-        for data in self.valid_loader:
+        for valid_steps, data in enumerate(self.valid_loader):
         
             inputs, labels, valid_name = data
             
@@ -71,8 +71,11 @@ class Noise2Noise(object):
             outputs = self.model(inputs)
             
             self.loss_size = self.loss(outputs, labels)
-            self.loss_meter.update(loss_size.item())
-        
+            self.loss_meter.update(self.loss_size.item())
+            
+            if valid_steps%10==0:
+                print("validated", valid_steps)
+
         for i in range(config['batch_size_valid']):
             labels = labels.cpu()
             outputs = outputs.cpu()
@@ -98,7 +101,7 @@ class Noise2Noise(object):
         'valid_psnr': []
         }
 
-        for epoch in range(self.epoch, config['num_epochs']):
+        for epoch in range(self.epoch + 1, config['num_epochs']):
 
             epoch_start_time = datetime.now()
 

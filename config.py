@@ -6,7 +6,7 @@ from dataset import *
 from noise2noise import Noise2Noise
 from torch.utils.data import DataLoader
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.cuda.device("cuda:1" if torch.cuda.is_available() else "cpu")
 print(device)
 
 # TODO
@@ -25,7 +25,7 @@ config = {
     'root_dir':'/home/turing/Documents/BE/',
     'log_dir': './log/',
     'data_folder':'./data/',
-    'num_epochs': 100,
+    'num_epochs': 300,
 }
 
 trainloader = datasetLoader(config, 'train')
