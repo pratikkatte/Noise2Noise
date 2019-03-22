@@ -1,6 +1,7 @@
 from datetime import datetime
 import numpy as np
 import torch
+import torch.nn.functional as F
 import os
 import json
 
@@ -44,7 +45,7 @@ def show_on_report(batch_idx, num_batches, loss, elapsed):
     print('Batch {:>{dec}d} / {:d} | Avg loss: {:>1.5f} | Avg train time / batch: {:d} ms'.format(batch_idx + 1, num_batches, loss, int(elapsed), dec=dec))
     
 def psnr(source, target):
-    return 10 * np.log10(1 / ((source - target)**2).mean())
+    return 10 * torch.log10(1 / F.mse_loss(source, target))
 
 
 def save_network(net, label, epoch,optimizer,loss_size, config, stats):

@@ -163,7 +163,7 @@ class Noise2Noise(object):
             stats['valid_loss'].append(valid_loss)
             stats['valid_psnr'].append(valid_psnr)
             self.summary.view_stats(stats, epoch)
-            save_network(self.model,'latest.pt', epoch, self.optimiser, loss_size, config, stats)
+            save_network(self.model,'latest.pt', epoch, self.optimiser, self.loss_size, config, stats)
 
         print("finished Training")
         
