@@ -1,4 +1,4 @@
-# Im# Noise2Noise: Learning Image Restoration without Clean Data
+# Noise2Noise: Learning Image Restoration without Clean Data
 age Restoration
 
 This is an unofficial PyTorch implementation of [Noise2Noise](https://arxiv.org/abs/1803.04189) (Lehtinen et al. 2018).
